@@ -6,7 +6,7 @@ import (
 	"simple_rest/api/protocol"
 	"simple_rest/database"
 	"simple_rest/env"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,14 +19,13 @@ type GetUserInput struct {
 func GetUser(c *gin.Context) {
 	res := &protocol.Response{}
 	input := &GetUserInput{}
-
 	// 綁定Input參數至結構中
 	if err := c.Bind(input); err != nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
-
+	fmt.Println(input.UserID)
 	u, err := getUserByID(input.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, protocol.SomethingWrongRes(err))

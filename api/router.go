@@ -22,7 +22,7 @@ func BindRouting(router *gin.Engine) {
 		v1.POST("/user/create",user.Create)
 		v1.POST("/user/delete",user.Delete)
 		v1.POST("user/pwd/change",user.Change)
-		v1.POST("user/login",user.Login)
+		v1.GET("user/login",user.Login)
 
 	}
 

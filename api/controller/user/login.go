@@ -3,44 +3,35 @@ package user
 import (
 	"log"
 	"net/http"
+	"simple_rest/api/protocol"
 	"simple_rest/database"
 	"simple_rest/env"
   "fmt"
 	"github.com/gin-gonic/gin"
 )
 
-type Login_Response struct {
-	Code    int         `json:"Code"`
-	Message string      `json:"Message"`
-	Result  interface{} `json:"Result"`
+type GetUserLogin struct{
+	GetAccount string `form:GetAccount`
+	GetPassword string `form:GetPassword`
 }
 
-
-
-func Login(c *gin.Context) {
+func Login(c *gin.Context,) {
   dbS := database.GetConn(env.AccountDB)
-  res1 := Login_Response{}
+  res1 := protocol.Response{}
 	var check input
 	res1.Result = nil
+	i_input := &GetUserLogin{}
 
-  //SQL Variables
-  var sid string
+
+	if err := c.Bind(i_input); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, res1)
+		return
+	}
+
+	var sid string
   var saccount string
   var spassword string
-
-  //User Variables
-  var use_account string
-  var use_password string
-
-  fmt.Printf("Account: ")
-  fmt.Scanf("%s",&use_account)
-  fmt.Printf("New Password: ")
-  fmt.Scanf("%s",&use_password)
-
-  //To check if true or false
-  var flag int
-  flag=0
-
 
 	// Query
 	rows, err := dbS.Query("SELECT id , account , password FROM user")
@@ -48,29 +39,20 @@ func Login(c *gin.Context) {
 	for rows.Next() {
 		err = rows.Scan(&sid,&saccount,&spassword)
 		checkErr(err)
-      if (use_account == saccount)&&(use_password == spassword){
-          flag = 1
+      if (i_input.GetAccount == saccount) && (i_input.GetPassword == spassword){
+        fmt.Println("Login Successful")
+        check.IsOk = true
+        break
       }
 
 	}
-  //Check login validation
-  if flag == 1{
-    fmt.Println("Success")
-    c.JSON(http.StatusOK, res1)
-  } else {
+
+  if(check.IsOk == false){
+		res1.Code  = 2
+		res1.Message = "Failed"
     fmt.Println("Login Failed")
-    res1.Message = "Fail"
-    res1.Code = 2
-		c.JSON(http.StatusBadRequest, res1)
-		return
   }
 
-	if err := c.Bind(&check); err != nil {
-		log.Println(err)
-		c.JSON(http.StatusBadRequest, res1)
-		return
-	}
-
-
+	c.JSON(http.StatusOK, res1)
   dbS.Close()
 }

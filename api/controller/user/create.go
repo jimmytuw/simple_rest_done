@@ -34,15 +34,9 @@ func Create(c *gin.Context) {
   var saccount string
   var spassword string
 
-  //User Variables
-  var use_account string
-  var use_password string
-
-  //Getting Information
-  fmt.Printf("Account: ")
-  fmt.Scanf("%s",&use_account)
-  fmt.Printf("Password: ")
-  fmt.Scanf("%s",&use_password)
+	//Fetching from form
+	user := c.PostForm("Account")
+	password := c.PostForm("Password")
 
   var flag int
   flag = 0
@@ -53,7 +47,7 @@ func Create(c *gin.Context) {
 	for rows.Next() {
 		err = rows.Scan(&sid,&saccount,&spassword)
 		checkErr(err)
-      if use_account == saccount{
+      if user == saccount{
         flag = 0
         break
       } else {
@@ -65,7 +59,7 @@ func Create(c *gin.Context) {
   if flag == 1{
     stmt, err := dbS.Prepare("INSERT user SET account=?, password=?")
     checkErr(err)
-    res, err := stmt.Exec(use_account,use_password)
+    res, err := stmt.Exec(user,password)
     checkErr(err)
     id, err := res.LastInsertId()
     checkErr(err)

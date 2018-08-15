@@ -10,10 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserInput struct {
+	account     string    `form:"Account" binding:"exists"`
+	password  string    `form:"Password" binding:"exists"`
+}
 
 
-
-func Change(c *gin.Context) {
+func Change(c *gin.Context,) {
   dbS := database.GetConn(env.AccountDB)
   res1 := protocol.Response{}
 	var check input
@@ -24,16 +27,9 @@ func Change(c *gin.Context) {
   var saccount string
   var spassword string
 
-  //User Variables
-  var use_account string
-  var use_password string
-
-  //Getting Information
-  fmt.Printf("Account: ")
-  fmt.Scanf("%s",&use_account)
-  fmt.Printf("New Password: ")
-  fmt.Scanf("%s",&use_password)
-
+	//Fetching from form
+	user := c.PostForm("Account")
+	password := c.PostForm("Password")
 
 
 	// Query
@@ -42,10 +38,10 @@ func Change(c *gin.Context) {
 	for rows.Next() {
 		err = rows.Scan(&sid,&saccount,&spassword)
 		checkErr(err)
-      if use_account == saccount{
+      if user == saccount{
         stmt, err := dbS.Prepare("UPDATE user SET password=? WHERE account=?")
         checkErr(err)
-        res, err := stmt.Exec(use_password,use_account)
+        res, err := stmt.Exec(password,user)
         checkErr(err)
         res.LastInsertId()
         fmt.Println("Update Completed!")

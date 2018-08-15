@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"simple_rest/api/protocol"
 	"time"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +13,7 @@ import (
 // GettingPersonInput : Input參數
 type GettingPersonInput struct {
 	Colors   []string  `form:"Colors[]"`
-	Name     string    `form:"Name" binding:"exists"`
+	Name     string    `form:"Name" binding:"required"`
 	Address  string    `form:"Address"`
 	Birthday time.Time `form:"Birthday" time_format:"2006-01-02T15:04:05Z07:00"`
 }
@@ -31,5 +32,6 @@ func Getting(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, res)
+	fmt.Println(person.Name)
 	return
 }

@@ -24,12 +24,8 @@ func Delete(c *gin.Context) {
   var saccount string
   var spassword string
 
-  //User Variables
-  var use_account string
-
-  //Getting Informations
-  fmt.Printf("Account: ")
-  fmt.Scanf("%s",&use_account)
+	//Fetching from form
+	user := c.PostForm("Account")
 
 
 	// Query
@@ -38,10 +34,10 @@ func Delete(c *gin.Context) {
 	for rows.Next() {
 		err = rows.Scan(&sid,&saccount,&spassword)
 		checkErr(err)
-      if use_account == saccount{
+      if user == saccount{
         stmt, err := dbS.Prepare("DELETE FROM user where account=?")
         checkErr(err)
-        res, err := stmt.Exec(use_account)
+        res, err := stmt.Exec(user)
         checkErr(err)
         id, err := res.LastInsertId()
         checkErr(err)
